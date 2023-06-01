@@ -1,14 +1,17 @@
 <script lang="ts">
-import cacheService from '@/service/cacheService';
+import type { SigninAuthDetails } from '@/model/AuthDetails';
+import authService from '@/service/authService';
+
 export default {
+  data() {
+    return {
+      authDetails: {username: '', password: ''} as SigninAuthDetails
+    }
+  },
   emits: ['afterSubmit'],
   methods: {
-    handleSubmit() {
-      // authenticate user... bla 
-      cacheService.storeLocal("username", "bob");
-
-      //var username = cacheService.fetchLocal<string>("username");
-
+    async handleSubmit() {
+      await authService.login(this.authDetails);
       this.$emit('afterSubmit');
     }
   }
@@ -20,11 +23,11 @@ export default {
   <form @submit.prevent="handleSubmit">
     <div>
       <label>Username</label>
-      <input type="username" />
+      <input type="text" v-model="authDetails.username" />
     </div>
     <div>
       <label>Password</label>
-      <input type="password"  />
+      <input type="password" v-model="authDetails.password"/>
     </div>
 
     <button type="submit">Login</button>

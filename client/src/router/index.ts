@@ -1,4 +1,4 @@
-import BookView from '@/views/BookView.vue';
+import LibraryView from '@/views/LibraryView.vue';
 import LoginView from '@/views/LoginView.vue';
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -28,7 +28,7 @@ const router = createRouter({
     {
       path: '/library',
       name: 'library',
-      component: BookView
+      component: LibraryView
     },
   ]
 })
