@@ -23,7 +23,18 @@ public class JwtdemoApplication {
     SpringApplication.run(JwtdemoApplication.class, args);
   }
 
+  @Bean
+  public OncePerRequestFilter corsFilter() {
+    return new OncePerRequestFilter() {
+      @Override
+      protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Headers", "authorization,content-type");
 
+        filterChain.doFilter(request, response);
+      }
+    };
+  }
 
   @Bean
   public OncePerRequestFilter authFilter() {
@@ -34,7 +45,7 @@ public class JwtdemoApplication {
         if(request.getMethod().equals("OPTIONS")) {
           response.setStatus(HttpServletResponse.SC_OK);
         }
-        else if(!request.getServletPath().contains("books")) {
+        else if(!request.getServletPath().contains("users")) {
           filterChain.doFilter(request, response);
         }
         else {
