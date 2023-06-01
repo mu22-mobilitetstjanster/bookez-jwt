@@ -2,7 +2,6 @@
 import BookList from '@/components/BookList.vue';
 import UserList from '@/components/UserList.vue';
 import jwtService from '@/service/jwtService';
-import axios from 'axios';
 
   export default {
     data() {
