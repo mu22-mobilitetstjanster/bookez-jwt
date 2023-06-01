@@ -1,6 +1,8 @@
 package com.example.jwtdemo.util;
 
 import com.example.jwtdemo.model.UserDetails;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -25,13 +27,14 @@ public class JwtUtil {
             .compact();
   }
 
-  public static boolean verify(String token) {
+  public static Claims verify(String token) {
     Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-    return Jwts
+    return (Claims) Jwts
             .parserBuilder()
             .setSigningKey(key)
             .build()
-            .parse(token) != null;
+            .parse(token)
+            .getBody();
   }
 }

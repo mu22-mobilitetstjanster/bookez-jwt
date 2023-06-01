@@ -1,6 +1,8 @@
 package com.example.jwtdemo;
 
+import com.example.jwtdemo.filter.AuthFilter;
 import com.example.jwtdemo.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 @SpringBootApplication
 public class JwtdemoApplication {
@@ -31,41 +34,21 @@ public class JwtdemoApplication {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Headers", "authorization,content-type");
 
-        filterChain.doFilter(request, response);
+        if(request.getMethod().equals("OPTIONS")) {
+          response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+          filterChain.doFilter(request, response);
+        }
       }
     };
   }
 
   @Bean
   public OncePerRequestFilter authFilter() {
-    return new OncePerRequestFilter() {
-      @Override
-      protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        if(request.getMethod().equals("OPTIONS")) {
-          response.setStatus(HttpServletResponse.SC_OK);
-        }
-        else if(!request.getServletPath().contains("users")) {
-          filterChain.doFilter(request, response);
-        }
-        else {
-          String authHeader = request.getHeader("authorization");
-          if(authHeader == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-          }
-          else {
-            String token = authHeader.replace("Bearer ", "");
-            try {
-              JwtUtil.verify(token);
-              filterChain.doFilter(request, response);
-            } catch(SignatureException ex) {
-              response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            } catch(ExpiredJwtException | MalformedJwtException ex) {
-              response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            }
-          }
-        }
-      }
-    };
+    return new AuthFilter(new HashMap<>() {{
+        put("/users/", new AuthFilter.GuardedPath(true, true));
+        put("/books/", new AuthFilter.GuardedPath(true, false));
+      }}
+    );
   }
 }
