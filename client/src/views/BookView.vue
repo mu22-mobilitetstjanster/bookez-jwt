@@ -7,7 +7,7 @@
       try {
         let resp = await axios.get("http://127.0.0.1:8080/books/", {headers});
         console.log(resp.data);
-      } catch(err) {
+      } catch(err: any) {
         console.warn(err.code);
       }
     }
