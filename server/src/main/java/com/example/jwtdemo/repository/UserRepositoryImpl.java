@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository("userRepository")
 public class UserRepositoryImpl implements UserRepository {
@@ -17,12 +18,11 @@ public class UserRepositoryImpl implements UserRepository {
   }};
 
   @Override
-  public UserDetails getUser(String username) {
+  public Optional<UserDetails> getUser(String username) {
     return users
             .stream()
             .filter(user -> user.getUsername().equals(username))
-            .findFirst()
-            .get();
+            .findFirst();
   }
 
   @Override

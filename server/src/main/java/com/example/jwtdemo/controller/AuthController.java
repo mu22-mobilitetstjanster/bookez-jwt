@@ -1,5 +1,6 @@
 package com.example.jwtdemo.controller;
 
+import com.example.jwtdemo.exception.UserAlreadyExistException;
 import com.example.jwtdemo.model.AuthDetails;
 import com.example.jwtdemo.model.UserDetails;
 import com.example.jwtdemo.service.UserService;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.NoSuchElementException;
+
 @RestController
 @RequestMapping("/auth/*")
 public class AuthController {
@@ -24,26 +27,24 @@ public class AuthController {
   public ResponseEntity<String> signIn(
           @RequestBody AuthDetails authDetails) {
 
-    UserDetails user = userService.get(authDetails.getUsername());
-
-    if(user == null) {
+    try {
+      UserDetails user = userService.get(authDetails.getUsername());
+      return ResponseEntity.ok(JwtUtil.sign(user));
+    } catch(NoSuchElementException ex) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-    return ResponseEntity.ok(JwtUtil.sign(user));
   }
 
   @PostMapping("register")
   public ResponseEntity<String> signUp(
           @RequestBody AuthDetails authDetails) {
 
-    UserDetails user = userService.add(authDetails);
-
-    if(user == null) {
+    try {
+      UserDetails user = userService.add(authDetails);
+      return ResponseEntity.ok(JwtUtil.sign(user));
+    } catch(UserAlreadyExistException ex) {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
-
-    return ResponseEntity.ok(JwtUtil.sign(user));
   }
 
   @PostMapping("verify")
